@@ -65,7 +65,7 @@ services:
       KAFKA_REST_PROXY_URL: http://kafka-rest:8082
       PROXY: "true"
   fluentd:
-    image: localhost:5000/my-fluentd:latest
+    build: ./fluentd/images/dev
     ports:
       - "5514:5514/tcp"
       - "5514:5514/udp"

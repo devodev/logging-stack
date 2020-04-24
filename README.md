@@ -3,23 +3,6 @@
 ## Development
 
 ### Docker Compose Usage
-Start local docker registry
-```
-$ docker run -d \
-             -p 5000:5000 \
-             --restart=always \
-             --name local \
-             registry:2
-```
-
-Build fluentd image and push to local registry
-```
-$ docker build -t my-base-fluentd:latest -f ./Dockerfile.base ./
-$ docker build -t my-fluentd:latest -f ./Dockerfile.dev ./
-$ docker tag my-fluentd:latest localhost:5000/my-fluentd:latest
-$ docker push localhost:5000/my-fluentd:latest
-```
-
 Start cluster in detached mode
 ```
 $ docker-compose up -d

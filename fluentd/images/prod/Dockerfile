@@ -7,11 +7,8 @@ RUN buildDeps="sudo make gcc g++ libc-dev" \
  && apt-get update \
  && apt-get install -y --no-install-recommends $buildDeps \
  && sudo gem install \
-              fluent-plugin-elasticsearch \
-              fluent-plugin-kafka \
-              #fluent-plugin-X \
-              #fluent-plugin-Y \
-              #fluent-plugin-Z \
+    fluent-plugin-elasticsearch \
+    fluent-plugin-kafka \
  && sudo gem sources --clear-all \
  && SUDO_FORCE_REMOVE=yes \
     apt-get purge -y --auto-remove \
@@ -21,3 +18,5 @@ RUN buildDeps="sudo make gcc g++ libc-dev" \
  && rm -rf /tmp/* /var/tmp/* /usr/lib/ruby/gems/*/cache/*.gem
 
 USER fluent
+
+COPY ./fluentd/conf/fluent.conf /fluentd/etc/
