@@ -1,24 +1,23 @@
-version: '3'
+version: "3.7"
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.0
-    ports:
-      - "2181:2181"
+    expose:
+      - "2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVER_ID: 1
   kafka:
     image: confluentinc/cp-kafka:5.5.0
-    ports:
+    expose:
       - "9092"
     depends_on:
       - zookeeper
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092
-      KAFKA_LISTENERS: INSIDE://:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://:9092
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       # Needed for kafka-topic-ui
       KAFKA_CONSUMER_REQUEST_TIMEOUT_MS: 30000
     volumes:
@@ -32,41 +31,39 @@ services:
       - kafka
     environment:
       ZK_HOSTS: zookeeper:2181
-      KAFKA_MANAGER_AUTH_ENABLED: 1
-      KAFKA_MANAGER_USERNAME: admin
-      KAFKA_MANAGER_PASSWORD: admin
   kafka-schema-registry:
     image: confluentinc/cp-schema-registry:5.5.0
-    ports:
-      - "8081:8081"
+    expose:
+      - "8081"
     depends_on:
       - zookeeper
       - kafka
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
+      # SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
       SCHEMA_REGISTRY_HOST_NAME: kafka-schema-registry
-      SCHEMA_REGISTRY_LISTENERS: ":8081"
-      SCHEMA_REGISTRY_DEBUG: 1
+      SCHEMA_REGISTRY_LISTENERS: http://kafka-schema-registry:8081
   kafka-rest:
     image: confluentinc/cp-kafka-rest:5.5.0
-    ports:
-      - "8082:8082"
+    expose:
+      - "8082"
     depends_on:
       - zookeeper
       - kafka
     environment:
       KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_REST_HOST_NAME: kafka-rest
-      KAFKA_REST_LISTENERS: ":8082"
+      KAFKA_REST_LISTENERS: http://0.0.0.0:8082
       KAFKA_REST_SCHEMA_REGISTRY_URL: kafka-schema-registry:8081
-  kafka-topic-ui:
+  kafka-topics-ui:
     image: landoop/kafka-topics-ui:0.9.4
     ports:
       - "8000:8000"
     depends_on:
       - kafka-rest
     environment:
-      KAFKA_REST_PROXY_URL: kafka-rest:8082
+      KAFKA_REST_PROXY_URL: http://kafka-rest:8082
+      PROXY: "true"
   fluentd:
     image: localhost:5000/my-fluentd:latest
     ports:
@@ -81,3 +78,6 @@ services:
       - FLUENTD_CONF=fluentd.conf
     volumes:
       - ./fluentd/conf:/fluentd/etc
+networks:
+  default:
+    driver: overlay
