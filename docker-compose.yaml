@@ -65,7 +65,13 @@ services:
       KAFKA_REST_PROXY_URL: http://kafka-rest:8082
       PROXY: "true"
   fluentd:
-    build: ./fluentd/images/dev
+    build:
+      context: ./fluentd/images/dev
+      args:
+        FLUENTD_PLUGINS: >-
+          fluent-plugin-elasticsearch
+          fluent-plugin-kafka
+          fluent-plugin-grok-parser
     ports:
       - "5514:5514/tcp"
       - "5514:5514/udp"
@@ -75,7 +81,7 @@ services:
     depends_on:
       - kafka
     environment:
-      - FLUENTD_CONF=fluentd.conf
+      FLUENTD_CONF: fluentd.conf
     volumes:
       - ./fluentd/conf:/fluentd/etc
 # updating to an overlay network is useful
