@@ -78,6 +78,8 @@ services:
       - FLUENTD_CONF=fluentd.conf
     volumes:
       - ./fluentd/conf:/fluentd/etc
+# updating to an overlay network is useful
+# for accessing services using localhost while deving
 networks:
   default:
     driver: overlay
