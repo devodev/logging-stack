@@ -64,6 +64,16 @@ services:
     environment:
       KAFKA_REST_PROXY_URL: http://kafka-rest:8082
       PROXY: "true"
+  grafana:
+    image: grafana/grafana:6.7.3
+    ports:
+      - "3000:3000"
+    environment:
+      GF_INSTALL_PLUGINS: >-
+        grafana-clock-panel,
+        grafana-simple-json-datasource
+    volumes:
+      - ./volumes/grafana:/var/lib/grafana
   fluentd:
     build:
       context: ./fluentd/images/dev
@@ -83,7 +93,7 @@ services:
     environment:
       FLUENTD_CONF: fluentd.conf
     volumes:
-      - ./fluentd/conf:/fluentd/etc
+      - ./volumes/fluentd:/fluentd/etc
 # updating to an overlay network is useful
 # for accessing services using localhost while deving
 networks:
