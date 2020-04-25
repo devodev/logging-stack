@@ -1,0 +1,27 @@
+version: "3.7"
+services:
+  grafana:
+    build: ./images/dev
+    ports:
+      - "3000:3000"
+    networks:
+      - grafana-in
+      - grafana-out
+    environment:
+      GRAFANA_VERSION: 6.7.3
+      GF_INSTALL_IMAGE_RENDERER_PLUGIN: "false"
+      # do not forget the comma at end of lines
+      GF_INSTALL_PLUGINS: >-
+        grafana-clock-panel,
+        grafana-simple-json-datasource
+    volumes:
+      - data:/var/lib/grafana
+networks:
+  grafana-in:
+    name: grafana-in
+    driver: bridge
+  grafana-out:
+    name: grafana-out
+    driver: overlay
+volumes:
+  data:
