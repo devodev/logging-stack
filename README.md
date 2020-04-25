@@ -13,40 +13,34 @@
 - fluentd
 ### Monitoring Stack
 - prometheus
+- loki
+- promtail
 - grafana
 #### Configured datasources
 - Prometheus
-- Grafana
-- Kafka broker
+- loki
 
 ## Usage
 ### Start
-- Start all containers in the correct order to correctly handle dependencies
-  ```
-  $ for stack in stack-*; do pushd $stack; docker-compose up -d; popd; done
-  ```
-- Navigate to localhost:3000</br>
-- Add prometheus datasource</br>
-- On home, click on `Create a data source`</br>
-- Select Prometheus from the list</br>
-- Under the settings tab, fill the form using the following and save</br>
-  ```
-  Name: Prometheus
-  URL:  http://prometheus:9090
-  ```
-- Click on the dashboard tab and import all listed dashboard
+Start all containers in the correct order
+```
+$ for stack in stack-*; do pushd $stack; docker-compose up -d --build; popd; done
+```
 
 ### Stop
-Stop all containers in reverse order to make sure dependencies arre correctly handled
+Stop all containers in reverse order
 ```
 $ for stack in $(ls -d stack-* | tac); do pushd $stack; docker-compose stop; popd; done
 ```
 ### Stop and Clean
-> DANGER: All data saved in volumes will be lost
+> To delete volumes, add the --volumes flag to the down command
 
-Same as above, but also remove all containers, volumes and networks declared
+Same as above, but also remove:
+- Containers for services defined in the Compose file
+- Networks defined in the `networks` section of the Compose file
+- The default network, if one is used
 ```
-$ for stack in $(ls -d stack-* | tac); do pushd $stack; docker-compose down; popd; done
+$ for stack in $(ls -d stack-* | tac); do pushd $stack; docker-compose down --remove-orphans; popd; done
 ```
 
 ## Docker Compose General Usage

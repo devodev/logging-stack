@@ -43,6 +43,7 @@ services:
     image: confluentinc/cp-schema-registry:5.5.0
     expose:
       - "8081"
+    restart: on-failure
     depends_on:
       - zookeeper
       - kafka
@@ -83,6 +84,7 @@ services:
     image: danielqsj/kafka-exporter:v1.2.0
     expose:
       - "9308"
+    restart: on-failure
     depends_on:
       - kafka
     networks:

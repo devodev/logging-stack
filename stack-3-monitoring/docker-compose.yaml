@@ -11,15 +11,37 @@ services:
     volumes:
       - ./prometheus/conf:/etc/prometheus
       - prometheus-data:/prometheus
+  loki:
+    image: grafana/loki:master-b652f0a
+    command: -config.file=/etc/loki/loki-config.yaml
+    restart: on-failure
+    expose:
+      - "3100"
+    networks:
+      - monitoring-in
+    volumes:
+      - ./loki/conf:/etc/loki
+  promtail:
+    image: grafana/promtail:master-b652f0a
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    expose:
+      - "9080"
+    networks:
+      - monitoring-in
+    volumes:
+      - ./promtail/conf:/etc/promtail
+      - promtail-log:/var/log
   grafana:
-    build: ./grafana/images/dev
+    build:
+      context: ./grafana/images/dev
+      args:
+        GRAFANA_VERSION: 6.7.3
     ports:
       - "3000:3000"
     networks:
       - monitoring-in
       - monitoring-out
     environment:
-      GRAFANA_VERSION: 6.7.3
       GF_INSTALL_IMAGE_RENDERER_PLUGIN: "false"
       # do not forget the comma at end of lines
       GF_INSTALL_PLUGINS: >-
@@ -28,6 +50,12 @@ services:
     volumes:
       - ./grafana/conf:/etc/grafana
       - grafana-data:/var/lib/grafana
+    # logging:
+    #   driver: loki
+    #   options:
+    #     loki-url: "http://loki:3100/loki/api/v1/push"
+    #     loki-retries: 5
+    #     loki-batch-size: 400
 networks:
   monitoring-in:
     name: monitoring-in
@@ -40,3 +68,4 @@ networks:
 volumes:
   prometheus-data:
   grafana-data:
+  promtail-log:

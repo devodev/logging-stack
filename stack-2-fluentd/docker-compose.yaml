@@ -4,6 +4,7 @@ services:
     build:
       context: ./images/dev
       args:
+        FLUENTD_VERSION: v1.10-debian-1
         FLUENTD_PLUGINS: >-
           fluent-plugin-elasticsearch
           fluent-plugin-kafka
@@ -14,10 +15,10 @@ services:
       - "24224:24224"
       - "24220:24220"
       - "9880:9880"
+    restart: always
     networks:
       - kafka-out
     environment:
-      FLUENTD_VERSION: v1.10-debian-1
       FLUENTD_CONF: fluentd.conf
     volumes:
       - "./conf:/fluentd/etc"
