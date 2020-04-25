@@ -1,9 +1,9 @@
-FROM fluent/fluentd:v1.10-debian-1 AS build
+ARG FLUENTD_VERSION="latest"
+FROM fluent/fluentd:${FLUENTD_VERSION} AS build
 
 ARG FLUENTD_PLUGINS=
 ENV BUILD_DEPS sudo make gcc g++ libc-dev
 
-# Use root account to use apt
 USER root
 
 RUN apt-get update \

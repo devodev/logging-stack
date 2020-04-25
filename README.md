@@ -1,8 +1,39 @@
 # logging-stack
 
+## Content
+### Kafka Stack
+Contains:
+- zookeeper
+- kafka broker
+- kafka manager
+- kafka-schema-registry
+- kafka-rest
+- kafka-topics-ui
+
+### Fluentd Stack
+Contains:
+- fluentd
+### Monitoring Stack
+Contains:
+- grafana
+
 ## Development
 
-### Docker Compose Usage
+### Usage
+Start all stacks
+```
+$ for stack in stack-*; do pushd $stack; docker-compose up -d; popd; done
+```
+Stop all stacks
+```
+$ for stack in $(ls -d stack-* | tac); do pushd $stack; docker-compose stop; popd; done
+```
+Stop and clean all stacks
+```
+$ for stack in $(ls -d stack-* | tac); do pushd $stack; docker-compose down; popd; done
+```
+
+### Docker Compose General Usage
 Start cluster in detached mode
 ```
 $ docker-compose up -d

@@ -1,0 +1,26 @@
+version: "3.7"
+services:
+  fluentd:
+    build:
+      context: ./images/dev
+      args:
+        FLUENTD_PLUGINS: >-
+          fluent-plugin-elasticsearch
+          fluent-plugin-kafka
+          fluent-plugin-grok-parser
+    ports:
+      - "5514:5514/tcp"
+      - "5514:5514/udp"
+      - "24224:24224"
+      - "24220:24220"
+      - "9880:9880"
+    networks:
+      - kafka-out
+    environment:
+      FLUENTD_VERSION: v1.10-debian-1
+      FLUENTD_CONF: fluentd.conf
+    volumes:
+      - "./conf:/fluentd/etc"
+networks:
+  kafka-out:
+    external: true

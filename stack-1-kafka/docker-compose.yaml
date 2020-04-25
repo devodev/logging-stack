@@ -4,6 +4,8 @@ services:
     image: confluentinc/cp-zookeeper:5.5.0
     expose:
       - "2181"
+    networks:
+      - kafka-in
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVER_ID: 1
@@ -13,6 +15,9 @@ services:
       - "9092"
     depends_on:
       - zookeeper
+    networks:
+      - kafka-in
+      - kafka-out
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://:9092
@@ -29,6 +34,9 @@ services:
     depends_on:
       - zookeeper
       - kafka
+    networks:
+      - kafka-in
+      - kafka-out
     environment:
       ZK_HOSTS: zookeeper:2181
   kafka-schema-registry:
@@ -38,6 +46,8 @@ services:
     depends_on:
       - zookeeper
       - kafka
+    networks:
+      - kafka-in
     environment:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
       # SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
@@ -50,6 +60,8 @@ services:
     depends_on:
       - zookeeper
       - kafka
+    networks:
+      - kafka-in
     environment:
       KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_REST_HOST_NAME: kafka-rest
@@ -61,41 +73,16 @@ services:
       - "8000:8000"
     depends_on:
       - kafka-rest
+    networks:
+      - kafka-in
+      - kafka-out
     environment:
       KAFKA_REST_PROXY_URL: http://kafka-rest:8082
       PROXY: "true"
-  grafana:
-    image: grafana/grafana:6.7.3
-    ports:
-      - "3000:3000"
-    environment:
-      GF_INSTALL_PLUGINS: >-
-        grafana-clock-panel,
-        grafana-simple-json-datasource
-    volumes:
-      - ./volumes/grafana:/var/lib/grafana
-  fluentd:
-    build:
-      context: ./fluentd/images/dev
-      args:
-        FLUENTD_PLUGINS: >-
-          fluent-plugin-elasticsearch
-          fluent-plugin-kafka
-          fluent-plugin-grok-parser
-    ports:
-      - "5514:5514/tcp"
-      - "5514:5514/udp"
-      - "24224:24224"
-      - "24220:24220"
-      - "9880:9880"
-    depends_on:
-      - kafka
-    environment:
-      FLUENTD_CONF: fluentd.conf
-    volumes:
-      - ./volumes/fluentd:/fluentd/etc
-# updating to an overlay network is useful
-# for accessing services using localhost while deving
 networks:
-  default:
+  kafka-in:
+    name: kafka-in
+    driver: bridge
+  kafka-out:
+    name: kafka-out
     driver: overlay
