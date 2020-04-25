@@ -79,6 +79,14 @@ services:
     environment:
       KAFKA_REST_PROXY_URL: http://kafka-rest:8082
       PROXY: "true"
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:v1.2.0
+    expose:
+      - "9308"
+    depends_on:
+      - kafka
+    networks:
+      - kafka-in
 networks:
   kafka-in:
     name: kafka-in

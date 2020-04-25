@@ -1,12 +1,23 @@
 version: "3.7"
 services:
+  prometheus:
+    image: prom/prometheus:v2.17.2
+    ports:
+      - 9090:9090
+    networks:
+      - monitoring-in
+      - monitoring-out
+      - kafka-in
+    volumes:
+      - ./prometheus/conf:/etc/prometheus
+      - prometheus-data:/prometheus
   grafana:
-    build: ./images/dev
+    build: ./grafana/images/dev
     ports:
       - "3000:3000"
     networks:
-      - grafana-in
-      - grafana-out
+      - monitoring-in
+      - monitoring-out
     environment:
       GRAFANA_VERSION: 6.7.3
       GF_INSTALL_IMAGE_RENDERER_PLUGIN: "false"
@@ -15,13 +26,17 @@ services:
         grafana-clock-panel,
         grafana-simple-json-datasource
     volumes:
-      - data:/var/lib/grafana
+      - ./grafana/conf:/etc/grafana
+      - grafana-data:/var/lib/grafana
 networks:
-  grafana-in:
-    name: grafana-in
+  monitoring-in:
+    name: monitoring-in
     driver: bridge
-  grafana-out:
-    name: grafana-out
+  monitoring-out:
+    name: monitoring-out
     driver: overlay
+  kafka-in:
+    external: true
 volumes:
-  data:
+  prometheus-data:
+  grafana-data:
