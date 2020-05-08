@@ -8,14 +8,18 @@
 - kafka-schema-registry
 - kafka-rest
 - kafka-topics-ui
+  - interface: http://localhost:8000/#/
 - kafka-exporter
+
 ### Fluentd Stack
 - fluentd
 ### Monitoring Stack
 - prometheus
+  - interface: http://localhost:9090/graph
 - loki
 - promtail
 - grafana
+  - interface: http://localhost:3000
 #### Configured datasources
 - Prometheus
 - loki
