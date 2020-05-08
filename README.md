@@ -19,6 +19,7 @@
   - interface: http://localhost:9090/graph
 - loki
 - promtail
+  - interface: http://localhost:9080
 - grafana
   - interface: http://localhost:3000
 #### Configured datasources

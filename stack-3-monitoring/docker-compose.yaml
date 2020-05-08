@@ -24,10 +24,11 @@ services:
   promtail:
     image: grafana/promtail:master-b652f0a
     command: -config.file=/etc/promtail/promtail-config.yaml
-    expose:
-      - "9080"
+    ports:
+      - "9080:9080"
     networks:
       - monitoring-in
+      - monitoring-out
     volumes:
       - ./promtail/conf:/etc/promtail
       - promtail-log:/var/log
