@@ -1,28 +1,88 @@
 version: "3.7"
 services:
-  zookeeper:
+  zookeeper-1:
     image: confluentinc/cp-zookeeper:5.5.0
     expose:
       - "2181"
+      - "2888"
+      - "3888"
     networks:
       - kafka-in
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVER_ID: 1
-  kafka:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:5.5.0
+    expose:
+      - "2181"
+      - "2888"
+      - "3888"
+    networks:
+      - kafka-in
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888
+  kafka-1:
     image: confluentinc/cp-kafka:5.5.0
     expose:
-      - "9092"
+      - "29092"
     depends_on:
-      - zookeeper
+      - zookeeper-1
+      - zookeeper-2
     networks:
       - kafka-in
       - kafka-out
     environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://:9092
       KAFKA_BROKER_ID: 1
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://:29092
+      # Needed for kafka-topic-ui
+      KAFKA_CONSUMER_REQUEST_TIMEOUT_MS: 30000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  kafka-2:
+    image: confluentinc/cp-kafka:5.5.0
+    expose:
+      - "39092"
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+    networks:
+      - kafka-in
+      - kafka-out
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://:39092
+      # Needed for kafka-topic-ui
+      KAFKA_CONSUMER_REQUEST_TIMEOUT_MS: 30000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  kafka-3:
+    image: confluentinc/cp-kafka:5.5.0
+    expose:
+      - "49092"
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+    networks:
+      - kafka-in
+      - kafka-out
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://:49092
       # Needed for kafka-topic-ui
       KAFKA_CONSUMER_REQUEST_TIMEOUT_MS: 30000
     volumes:
@@ -32,39 +92,48 @@ services:
     ports:
       - "9000:9000"
     depends_on:
-      - zookeeper
-      - kafka
+      - zookeeper-1
+      - zookeeper-2
+      - kafka-1
+      - kafka-2
+      - kafka-3
     networks:
       - kafka-in
       - kafka-out
     environment:
-      ZK_HOSTS: zookeeper:2181
+      ZK_HOSTS: zookeeper-1:2181,zookeeper-2:2181
   kafka-schema-registry:
     image: confluentinc/cp-schema-registry:5.5.0
     expose:
       - "8081"
     restart: on-failure
     depends_on:
-      - zookeeper
-      - kafka
+      - zookeeper-1
+      - zookeeper-2
+      - kafka-1
+      - kafka-2
+      - kafka-3
     networks:
       - kafka-in
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
-      # SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper:2181
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka-1:29092,PLAINTEXT://kafka-2:39092,PLAINTEXT://kafka-3:49092
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper-1:2181,zookeeper-2:2181
       SCHEMA_REGISTRY_HOST_NAME: kafka-schema-registry
       SCHEMA_REGISTRY_LISTENERS: http://kafka-schema-registry:8081
   kafka-rest:
     image: confluentinc/cp-kafka-rest:5.5.0
     expose:
       - "8082"
+    restart: on-failure
     depends_on:
-      - zookeeper
-      - kafka
+      - zookeeper-1
+      - zookeeper-2
+      - kafka-1
+      - kafka-2
     networks:
       - kafka-in
     environment:
-      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_REST_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
       KAFKA_REST_HOST_NAME: kafka-rest
       KAFKA_REST_LISTENERS: http://0.0.0.0:8082
       KAFKA_REST_SCHEMA_REGISTRY_URL: kafka-schema-registry:8081
@@ -82,11 +151,17 @@ services:
       PROXY: "true"
   kafka-exporter:
     image: danielqsj/kafka-exporter:v1.2.0
+    command: >-
+      --kafka.server=kafka-1:29092
+      --kafka.server=kafka-2:39092
+      --kafka.server=kafka-3:49092
     expose:
       - "9308"
     restart: on-failure
     depends_on:
-      - kafka
+      - kafka-1
+      - kafka-2
+      - kafka-3
     networks:
       - kafka-in
 networks:
