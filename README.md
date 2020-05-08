@@ -5,6 +5,7 @@
 - zookeeper
 - kafka broker
 - kafka manager
+  - interface: http://localhost:9000/
 - kafka-schema-registry
 - kafka-rest
 - kafka-topics-ui
