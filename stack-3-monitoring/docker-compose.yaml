@@ -15,10 +15,11 @@ services:
     image: grafana/loki:master-b652f0a
     command: -config.file=/etc/loki/loki-config.yaml
     restart: on-failure
-    expose:
-      - "3100"
+    ports:
+      - "3100:3100"
     networks:
       - monitoring-in
+      - monitoring-out
     volumes:
       - ./loki/conf:/etc/loki
   promtail:
