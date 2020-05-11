@@ -2,26 +2,47 @@ version: "3.7"
 services:
   fluentd:
     build:
-      context: ./images/dev
+      context: ./images/fluentd
       args:
         FLUENTD_VERSION: v1.10-debian-1
         FLUENTD_PLUGINS: >-
           fluent-plugin-elasticsearch
           fluent-plugin-kafka
           fluent-plugin-grok-parser
+          fluent-plugin-prometheus
     ports:
       - "5514:5514/tcp"
       - "5514:5514/udp"
       - "24224:24224"
       - "24220:24220"
       - "9880:9880"
+    expose:
+      - "24231"
     restart: always
     networks:
+      - fluentd-in
+      - fluentd-out
       - kafka-out
     environment:
       FLUENTD_CONF: fluentd.conf
     volumes:
       - "./conf:/fluentd/etc"
+  fluentd-ui:
+    build:
+      context: ./images/fluentd-ui
+      args:
+        FLUENTD_UI_VERSION: 1.0.0
+    ports:
+      - "9292:9292"
+    networks:
+      - fluentd-in
+      - fluentd-out
 networks:
+  fluentd-in:
+    name: fluentd-in
+    driver: bridge
+  fluentd-out:
+    name: fluentd-out
+    driver: overlay
   kafka-out:
     external: true

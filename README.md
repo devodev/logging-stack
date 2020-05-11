@@ -2,29 +2,50 @@
 
 ## Content
 ### Kafka Stack
-- zookeeper
-- kafka broker
+- zookeeper X2
+- kafka broker X3
 - kafka manager
-  - interface: http://localhost:9000/
+  - UI: http://localhost:9000
 - kafka-schema-registry
 - kafka-rest
 - kafka-topics-ui
-  - interface: http://localhost:8000/#/
+  - UI: http://localhost:8000
 - kafka-exporter
+  - prometheus metrics: true
 
 ### Fluentd Stack
 - fluentd
+  - prometheus metrics: true
+
 ### Monitoring Stack
 - prometheus
-  - interface: http://localhost:9090/graph
+  - UI: http://localhost:9090
+  - prometheus metrics: true
+  - targets:
+    - prometheus (itself)
+    - grafana
+    - loki
+    - promtail
+    - kafka (kafka-exporter)
+    - fluentd
 - loki
+  - prometheus metrics: true
 - promtail
-  - interface: http://localhost:9080
+  - UI: http://localhost:9080
+  - prometheus metrics: true
+  - targets:
+    - system (varlogs)
 - grafana
-  - interface: http://localhost:3000
-#### Configured datasources
-- Prometheus
-- loki
+  - UI: http://localhost:3000
+  - prometheus metrics: true
+  - datasources:
+    - Prometheus
+    - Loki
+  - dashboards:
+    - Grafana metrics
+    - Kafka Exporter Overview
+    - Prometheus Stats
+    - Prometheus 2.0 Stats
 
 ## Usage
 ### Start
