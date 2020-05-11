@@ -8,6 +8,7 @@ services:
       - monitoring-in
       - monitoring-out
       - kafka-in
+      - fluentd-in
     volumes:
       - ./prometheus/conf:/etc/prometheus
       - prometheus-data:/prometheus
@@ -27,6 +28,8 @@ services:
     command: -config.file=/etc/promtail/promtail-config.yaml
     ports:
       - "9080:9080"
+    depends_on:
+      - loki
     networks:
       - monitoring-in
       - monitoring-out
@@ -52,12 +55,6 @@ services:
     volumes:
       - ./grafana/conf:/etc/grafana
       - grafana-data:/var/lib/grafana
-    # logging:
-    #   driver: loki
-    #   options:
-    #     loki-url: "http://loki:3100/loki/api/v1/push"
-    #     loki-retries: 5
-    #     loki-batch-size: 400
 networks:
   monitoring-in:
     name: monitoring-in
@@ -66,6 +63,8 @@ networks:
     name: monitoring-out
     driver: overlay
   kafka-in:
+    external: true
+  fluentd-in:
     external: true
 volumes:
   prometheus-data:
