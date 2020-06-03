@@ -17,7 +17,7 @@ services:
     command: -config.file=/etc/loki/loki-config.yaml
     restart: on-failure
     ports:
-      - "3100:3100"
+      - "4100:4100"
     networks:
       - monitoring-in
       - monitoring-out
@@ -42,11 +42,12 @@ services:
       args:
         GRAFANA_VERSION: 6.7.3
     ports:
-      - "3000:3000"
+      - "4000:4000"
     networks:
       - monitoring-in
       - monitoring-out
     environment:
+      GF_SERVER_HTTP_PORT: 4000
       GF_INSTALL_IMAGE_RENDERER_PLUGIN: "false"
       # do not forget the comma at end of lines
       GF_INSTALL_PLUGINS: >-

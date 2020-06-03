@@ -18,7 +18,7 @@ datasources:
   access: proxy
   orgId: 1
   uid: loki1
-  url: http://loki:3100
+  url: http://loki:4100
   isDefault: false
   version: 1
   editable: true

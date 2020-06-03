@@ -18,12 +18,12 @@ scrape_configs:
     scrape_interval: 5s
     scrape_timeout: 5s
     static_configs:
-      - targets: ['grafana:3000']
+      - targets: ['grafana:4000']
   - job_name: 'loki'
     scrape_interval: 5s
     scrape_timeout: 5s
     static_configs:
-      - targets: ['loki:3100']
+      - targets: ['loki:4100']
   - job_name: 'promtail'
     scrape_interval: 5s
     scrape_timeout: 5s

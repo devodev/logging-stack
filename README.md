@@ -40,7 +40,7 @@
   - targets:
     - system (varlogs)
 - grafana
-  - [UI - localhost:3000](http://localhost:3000)
+  - [UI - localhost:4000](http://localhost:3000)
   - prometheus metrics: true
   - datasources:
     - Prometheus
