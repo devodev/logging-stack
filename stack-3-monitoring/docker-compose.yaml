@@ -10,7 +10,7 @@ services:
       - kafka-in
       - fluentd-in
     volumes:
-      - ./prometheus/conf:/etc/prometheus
+      - ./prometheus/conf:/etc/prometheus:ro
       - prometheus-data:/prometheus
   loki:
     image: grafana/loki:master-b652f0a
@@ -22,7 +22,7 @@ services:
       - monitoring-in
       - monitoring-out
     volumes:
-      - ./loki/conf:/etc/loki
+      - ./loki/conf:/etc/loki:ro
   promtail:
     image: grafana/promtail:master-b652f0a
     command: -config.file=/etc/promtail/promtail-config.yaml
@@ -34,8 +34,30 @@ services:
       - monitoring-in
       - monitoring-out
     volumes:
-      - ./promtail/conf:/etc/promtail
+      - ./promtail/conf:/etc/promtail:ro
       - promtail-log:/var/log
+  influxdb:
+    image: influxdb:1.8
+    command: -config /etc/influxdb/influxdb.conf
+    expose:
+      - "8083"
+      - "8086"
+    networks:
+      - monitoring-in
+    volumes:
+      - ./influxdb/conf:/etc/influxdb:ro
+      - influxdb-data:/var/lib/influxd
+  telegraf:
+    image: telegraf:1.12
+    command: -config /etc/telegraf/telegraf.conf
+    ports:
+      - "8125:8125/udp"
+    networks:
+      - monitoring-in
+      - monitoring-out
+    volumes:
+      - ./telegraf/conf:/etc/telegraf:ro
+      - /var/run/docker.sock:/var/run/docker.sock
   grafana:
     build:
       context: ./grafana/images/dev
@@ -43,6 +65,10 @@ services:
         GRAFANA_VERSION: 6.7.3
     ports:
       - "4000:4000"
+    depends_on:
+      - prometheus
+      - loki
+      - telegraf
     networks:
       - monitoring-in
       - monitoring-out
@@ -54,7 +80,7 @@ services:
         grafana-clock-panel,
         grafana-simple-json-datasource
     volumes:
-      - ./grafana/conf:/etc/grafana
+      - ./grafana/conf:/etc/grafana:ro
       - grafana-data:/var/lib/grafana
 networks:
   monitoring-in:
@@ -70,4 +96,5 @@ networks:
 volumes:
   prometheus-data:
   grafana-data:
+  influxdb-data:
   promtail-log:

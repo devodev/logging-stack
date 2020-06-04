@@ -45,11 +45,31 @@
   - datasources:
     - Prometheus
     - Loki
+    - Telegraf
   - dashboards:
     - Grafana metrics
     - Kafka Exporter Overview
     - Prometheus Stats
     - Prometheus 2.0 Stats
+    - Telegraf metrics
+- influxdb
+  - prometheus metrics: false
+- telegraf
+  - prometheus metrics: false
+  - Outputs configured
+    - InfluxDB
+  - Inputs Configured
+    - cpu
+    - disk
+    - diskio
+    - kernel
+    - mem
+    - processes
+    - swap
+    - system
+    - docker
+    - influxdb
+    - statsD
 
 ## Usage
 

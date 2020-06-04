@@ -22,3 +22,12 @@ datasources:
   isDefault: false
   version: 1
   editable: true
+- name: InfluxDB
+  type: influxdb
+  access: proxy
+  orgId: 1
+  uid: influxdb1
+  url: http://influxdb:8086
+  isDefault: false
+  version: 1
+  editable: true
