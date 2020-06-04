@@ -52,10 +52,11 @@
     - Prometheus Stats
     - Prometheus 2.0 Stats
     - Telegraf metrics
+  - notifiers:
+    - kafka
+      - topic: grafana-notifications
 - influxdb
-  - prometheus metrics: false
 - telegraf
-  - prometheus metrics: false
   - Outputs configured
     - InfluxDB
   - Inputs Configured
