@@ -78,7 +78,7 @@ services:
       # do not forget the comma at end of lines
       GF_INSTALL_PLUGINS: >-
         grafana-clock-panel,
-        grafana-simple-json-datasource
+        grafana-simple-json-datasource,
         grafana-piechart-panel
     volumes:
       - ./grafana/conf:/etc/grafana:ro
