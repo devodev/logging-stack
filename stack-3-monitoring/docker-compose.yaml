@@ -79,6 +79,7 @@ services:
       GF_INSTALL_PLUGINS: >-
         grafana-clock-panel,
         grafana-simple-json-datasource
+        grafana-piechart-panel
     volumes:
       - ./grafana/conf:/etc/grafana:ro
       - grafana-data:/var/lib/grafana
