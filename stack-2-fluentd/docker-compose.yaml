@@ -10,6 +10,7 @@ services:
           fluent-plugin-kafka
           fluent-plugin-grok-parser
           fluent-plugin-prometheus
+    restart: always
     ports:
       - "5514:5514/tcp"
       - "5514:5514/udp"
@@ -18,7 +19,6 @@ services:
       - "9880:9880"
     expose:
       - "24231"
-    restart: always
     networks:
       - fluentd-in
       - fluentd-out
@@ -32,6 +32,7 @@ services:
       context: ./images/fluentd-ui
       args:
         FLUENTD_UI_VERSION: 1.0.0
+    restart: always
     ports:
       - "9292:9292"
     networks:

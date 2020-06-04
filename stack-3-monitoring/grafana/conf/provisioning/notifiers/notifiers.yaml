@@ -1,0 +1,13 @@
+notifiers:
+  - name: kafka-notifications
+    type: kafka
+    uid: kafka-notifier1
+    org_id: 1
+    is_default: true
+    send_reminder: true
+    # reminder frequency
+    frequency: 1h
+    disable_resolve_message: false
+    settings:
+      kafkaRestProxy: http://kafka-rest:8082
+      kafkaTopic: grafana-notifications

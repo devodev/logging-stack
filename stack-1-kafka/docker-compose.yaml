@@ -2,6 +2,7 @@ version: "3.7"
 services:
   zookeeper-1:
     image: confluentinc/cp-zookeeper:5.5.0
+    restart: always
     expose:
       - "2181"
       - "2888"
@@ -17,6 +18,7 @@ services:
       ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888
   zookeeper-2:
     image: confluentinc/cp-zookeeper:5.5.0
+    restart: always
     expose:
       - "2181"
       - "2888"
@@ -32,6 +34,7 @@ services:
       ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888
   kafka-1:
     image: confluentinc/cp-kafka:5.5.0
+    restart: always
     expose:
       - "29092"
     depends_on:
@@ -51,6 +54,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
   kafka-2:
     image: confluentinc/cp-kafka:5.5.0
+    restart: always
     expose:
       - "39092"
     depends_on:
@@ -70,6 +74,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
   kafka-3:
     image: confluentinc/cp-kafka:5.5.0
+    restart: always
     expose:
       - "49092"
     depends_on:
@@ -89,6 +94,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
   kafka-manager:
     image: kafkamanager/kafka-manager:3.0.0.4
+    restart: always
     ports:
       - "9000:9000"
     depends_on:
@@ -106,7 +112,7 @@ services:
     image: confluentinc/cp-schema-registry:5.5.0
     expose:
       - "8081"
-    restart: on-failure
+    restart: always
     depends_on:
       - zookeeper-1
       - zookeeper-2
@@ -124,12 +130,13 @@ services:
     image: confluentinc/cp-kafka-rest:5.5.0
     expose:
       - "8082"
-    restart: on-failure
+    restart: always
     depends_on:
       - zookeeper-1
       - zookeeper-2
       - kafka-1
       - kafka-2
+      - kafka-3
     networks:
       - kafka-in
     environment:
@@ -139,6 +146,7 @@ services:
       KAFKA_REST_SCHEMA_REGISTRY_URL: kafka-schema-registry:8081
   kafka-topics-ui:
     image: landoop/kafka-topics-ui:0.9.4
+    restart: always
     ports:
       - "8000:8000"
     depends_on:
@@ -155,9 +163,9 @@ services:
       --kafka.server=kafka-1:29092
       --kafka.server=kafka-2:39092
       --kafka.server=kafka-3:49092
+    restart: always
     expose:
       - "9308"
-    restart: on-failure
     depends_on:
       - kafka-1
       - kafka-2
