@@ -4,7 +4,7 @@ services:
     image: prom/prometheus:v2.17.2
     restart: always
     ports:
-      - 9090:9090
+      - "9090:9090"
     networks:
       - monitoring-in
       - monitoring-out
@@ -13,6 +13,17 @@ services:
     volumes:
       - ./prometheus/conf:/etc/prometheus:ro
       - prometheus-data:/prometheus
+  alertmanager:
+    image: prom/alertmanager:v0.20.0
+    restart: always
+    ports:
+      - "9093:9093"
+    networks:
+      - monitoring-in
+      - monitoring-out
+    volumes:
+      - ./alertmanager/conf:/etc/alertmanager:ro
+      - alertmanager-data:/alertmanager
   loki:
     image: grafana/loki:master-b652f0a
     command: -config.file=/etc/loki/loki-config.yaml
@@ -102,6 +113,7 @@ networks:
     external: true
 volumes:
   prometheus-data:
+  alertmanager-data:
   grafana-data:
   influxdb-data:
   promtail-log:

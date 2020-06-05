@@ -32,6 +32,9 @@
     - promtail
     - kafka (kafka-exporter)
     - fluentd
+- alertmanager
+  - [UI - localhost:9093](http://localhost:9093)
+  - prometheus metrics: true
 - loki
   - prometheus metrics: true
 - promtail

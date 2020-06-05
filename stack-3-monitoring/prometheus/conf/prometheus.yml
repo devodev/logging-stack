@@ -7,6 +7,17 @@ global:
   external_labels:
     monitor: 'external-monitor'
 
+rule_files:
+ - rules.yml
+
+alerting:
+  alert_relabel_configs:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        - "alertmanager:9093"
+
+
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
 scrape_configs:
@@ -14,6 +25,10 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ['localhost:9090']
+  - job_name: 'alertmanager'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['alertmanager:9093']
   - job_name: 'grafana'
     scrape_interval: 5s
     scrape_timeout: 5s
